@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>world Clock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="./script.js"></script>
+    <style>
+        body {
+            background-image: url('https://wallpapercave.com/wp/Dq6o3uI.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: 100%;
+            height: 100%;
+            min-height: 90vh;
+        }
+
+        div button:hover {
+            background-color: rgb(211, 210, 208);
+            color: black;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .row {
+                margin-left: 0px !important;
+                margin-right: 0px !important;
+            }
+            body {
+            height: 100%;
+            min-height: 100vh;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center mt-5">
+            <div class="col-10 col-md-6 col-lg-4">
+                <div class="border border-dark border-2 rounded shadow-lg p-5"
+                    style="background-color: rgb(203, 186, 163);">
+                    <form>
+                        <p class="text-dark text-center" style="font-size: x-large;">Current Date and Time</p>
+                        <label for="selectTimeZone">Select Timezone:</label>
+                        <select id="selectTimeZone" class="form-control mb-3"
+                            aria-label="Default select example"></select>
+                        <div class="text-center">
+                            <button type="button" onclick="displayDateTime()"
+                                class="btn btn-dark btn-block">Submit</button>
+                        </div>
+                    </form>
+                    <!-- Empty Div -->
+                    <div class="mt-4" id="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            // Select the <select> element
+            var select = document.getElementById("selectTimeZone");
+            // Array of options to be added
+            var options = [];
+
+            var timezones = await fetchTimeZones();
+            console.log(timezones);
+            timezones.forEach(t => options.push({ text: t, value: t }));
+
+            // Loop through the options array and add each option to the select element
+            options.forEach(function (option) {
+                var optionElement = document.createElement("option");
+                optionElement.textContent = option.text;
+                optionElement.value = option.value;
+                select.appendChild(optionElement);
+            });
+        });
+
+        async function fetchTimeZones() {
+            try {
+                const response = await fetch('https://worldtimeapi.org/api/timezone');
+                const data = await response.json();
+                return data; //array
+            }
+            catch (error) {
+                console.error('Error: ', error);
+                throw error;
+            }
+        }
+
+        async function displayDateTime() {
+            var selectedTimeZone = document.getElementById("selectTimeZone").value;
+            var dateTimeObject = await fetchDateTime(selectedTimeZone);
+            console.log(dateTimeObject);
+            document.getElementById('result').innerHTML =
+                `<p><b>TimeZone: </b>${dateTimeObject.timezone}</p>
+            <p><b>Date-Time: </b>${dateTimeObject.datetime}</p> 
+            <p><b>Day of week: </b>${dateTimeObject.day_of_week}</p>  
+            <p><b>Day of year: </b>${dateTimeObject.day_of_year}</p>
+            <p><b>Week number: </b>${dateTimeObject.week_number}</p>`;
+        }
+
+        async function fetchDateTime(timeZone) {
+            try {
+                const response = await fetch(`https://worldtimeapi.org/api/timezone/${timeZone}`);
+                const data = await response.json();
+                return data; //array
+            }
+            catch (error) {
+                console.error('Error: ', error);
+                throw error;
+            }
+        }
+    </script>
+</body>
+
+</html>
